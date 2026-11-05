@@ -6,33 +6,38 @@
 <title>Build an Argument</title>
 <style>
 :root {
-  --bg: #f6f5f1;
+  --bg: #ffffff;
   --panel: #ffffff;
-  --ink: #1f2328;
-  --muted: #5d6470;
-  --line: #d8d6cf;
-  --claim: #ffe566;
-  --claim-light: #fffbe3;
-  --claim-edge: #d9b400;
-  --conn: #9fd0ff;
-  --conn-light: #eef6ff;
-  --conn-edge: #3a8ee6;
+  --sheet: #f5f6f8;
+  --ink: #16181b;
+  --muted: #5c636c;
+  --line: #e1e4e8;
+  --claim: #fff1b8;
+  --claim-light: #fff9e3;
+  --claim-edge: #e6be2a;
+  --claim-ink: #8a6a00;
+  --open: #ffe2c4; --open-edge: #ea8a3e; --open-ink: #b4530b;
+  --conn: #d4e8fc;
+  --conn-light: #eef5fe;
+  --conn-edge: #3d8be0;
   --extract: #ffffff;
-  --extract-edge: #9aa0a6;
+  --extract-edge: #b8bec6;
   --good: #1f8a4c;
-  --good-bg: #e3f5ea;
+  --good-bg: #e6f6ec;
   --warn: #a86400;
-  --warn-bg: #fff1dc;
+  --warn-bg: #fff4e2;
   --bad: #c0392b;
-  --bad-bg: #fde6e3;
-  --info-bg: #eef1f6;
+  --bad-bg: #fdecea;
+  --info-bg: #f1f4f8;
   --accent: #2463c7;
-  --shadow: 0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+  --shadow: 0 1px 2px rgba(16,24,40,.06);
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #17191d; --panel: #20242a; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47;
-    --claim: #6b5a12; --claim-light: #2f2a16; --claim-edge: #c9a72a; --conn: #1f5687; --conn-light: #1a2633; --conn-edge: #5aa7f0;
+    --bg: #17191d; --panel: #20242a; --sheet: #1d2025; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47;
+    --claim: #6b5a12; --claim-light: #2f2a16; --claim-edge: #c9a72a; --conn: #1f5687; --conn-light: #1a2633; --conn-edge: #5aa7f0; --open: #6e3f12; --open-edge: #e8923a; --claim-ink: #e3c55a; --open-ink: #f0a964;
     --extract: #2a2e35; --extract-edge: #7d848e;
     --good: #5fd08e; --good-bg: #173a27; --warn: #f0b35a; --warn-bg: #3d2e16;
     --bad: #f0796c; --bad-bg: #42201d; --info-bg: #262b33; --accent: #6ea8ff;
@@ -40,8 +45,8 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #17191d; --panel: #20242a; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47;
-  --claim: #6b5a12; --claim-light: #2f2a16; --claim-edge: #c9a72a; --conn: #1f5687; --conn-light: #1a2633; --conn-edge: #5aa7f0;
+  --bg: #17191d; --panel: #20242a; --sheet: #1d2025; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47;
+  --claim: #6b5a12; --claim-light: #2f2a16; --claim-edge: #c9a72a; --conn: #1f5687; --conn-light: #1a2633; --conn-edge: #5aa7f0; --open: #6e3f12; --open-edge: #e8923a; --claim-ink: #e3c55a; --open-ink: #f0a964;
   --extract: #2a2e35; --extract-edge: #7d848e;
   --good: #5fd08e; --good-bg: #173a27; --warn: #f0b35a; --warn-bg: #3d2e16;
   --bad: #f0796c; --bad-bg: #42201d; --info-bg: #262b33; --accent: #6ea8ff;
@@ -50,7 +55,7 @@
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 16px/1.45 var(--sans);
 }
 header { padding: 16px 48px 0 16px; max-width: 1280px; margin: 0 auto; }
 h1 { font-size: 1.35rem; margin: 0; }
@@ -91,11 +96,21 @@ nav.tabs button {
 }
 nav.tabs .reset {
   margin-left: auto; align-self: center; margin-bottom: 4px; border: none; background: transparent;
-  color: var(--bad); padding: 6px 4px; font-size: .88rem; cursor: pointer;
+  color: var(--bad); padding: 6px 4px; font-size: .88rem; cursor: pointer; user-select: none;
 }
+nav.tabs .reset.print-link { color: var(--accent); }
+nav.tabs .reset.print-link + .reset { margin-left: 8px; }
 nav.tabs .reset:hover, nav.tabs .reset:focus-visible { text-decoration: underline; }
-nav.tabs button[aria-selected="true"] { background: var(--panel); color: var(--ink); font-weight: 600; }
-main { max-width: 1280px; margin: 0 auto; padding: 16px 48px 16px 16px; }
+/* the selected tab and the content below it share one background, so they read as one sheet */
+nav.tabs button[aria-selected="true"] {
+  background: var(--sheet); color: var(--ink); font-weight: 600; position: relative; margin-bottom: -1px;
+  border-bottom: 1px solid var(--sheet);
+}
+#app > .layout {
+  background: var(--sheet); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 16px;
+}
+@media (max-width: 560px) { #app > .layout { padding: 8px; } }
+main { max-width: 1280px; margin: 0 auto; padding: 0 48px 16px 16px; }
 /* instructions: off-canvas panel from the right, collapsing to a vertical tab */
 #brief {
   position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 92vw); z-index: 900;
@@ -137,13 +152,13 @@ body.brief-open #brief-tab { display: none; }
 }
 @media (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); } }
 .zone {
-  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px;
   min-height: 120px;
 }
 .zone h2 { font-size: 1rem; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 #deck > h2 {
   position: sticky; top: 0; z-index: 3; background: var(--panel);
-  margin: -12px -12px 8px; padding: 12px 12px 8px; border-radius: 10px 10px 0 0;
+  margin: -12px -12px 8px; padding: 12px 12px 8px; border-radius: 8px 8px 0 0;
   border-bottom: 1px solid var(--line);
 }
 .zone h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 12px 0 6px; }
@@ -154,13 +169,13 @@ body.brief-open #brief-tab { display: none; }
 .deck-empty { color: var(--muted); font-size: .9rem; }
 
 .card {
-  position: relative; border-radius: 8px; padding: 10px 12px; box-shadow: var(--shadow);
-  cursor: grab; user-select: none; touch-action: none; border: 2px solid transparent;
+  position: relative; border-radius: 6px; padding: 10px 12px; box-shadow: var(--shadow);
+  cursor: grab; user-select: none; touch-action: none; border: 1.5px solid transparent;
 }
 .card:active { cursor: grabbing; }
 .card.claim { background: var(--claim); border-color: var(--claim-edge); }
 .card.extract { background: var(--extract); border-color: var(--extract-edge); }
-.card.extract .txt { font-style: italic; }
+.card.extract .txt { font-family: var(--serif); font-style: italic; font-size: 1.02rem; }
 .card.conn {
   background: var(--conn); border-color: var(--conn-edge); font-weight: 600; padding: 8px 12px;
   border-radius: 20px;
@@ -170,7 +185,7 @@ body.brief-open #brief-tab { display: none; }
   font-variant: small-caps; text-transform: lowercase; letter-spacing: .04em; opacity: .75; pointer-events: none;
 }
 .card.claim, .card.extract, .card.interp { padding-bottom: 20px; }
-.card .src { font-size: .82rem; font-style: italic; color: var(--muted); margin-top: 4px; }
+.card .src { font-family: var(--serif); font-size: .84rem; font-style: italic; color: var(--muted); margin-top: 4px; }
 .card .weigh { font-size: .84rem; margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: rgba(127,127,127,.12); }
 .card textarea {
   width: 100%; font: inherit; font-size: .95rem; border: 1px dashed var(--muted); border-radius: 6px;
@@ -198,11 +213,16 @@ body.brief-open #brief-tab { display: none; }
   box-shadow: 0 10px 24px rgba(0,0,0,.25); opacity: .95; margin: 0 !important;
 }
 .card.snap { animation: snap .28s ease-out; }
+body.is-dragging, body.is-dragging * { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+/* insertion bar while reordering the deck: a line across for claims, a bar between connective pills */
+.deck-gap { background: var(--accent); border-radius: 2px; pointer-events: none; }
+.deck-claims > .deck-gap { flex: 1 0 100%; height: 4px; margin: 3px 0; }
+.deck-conns > .deck-gap { width: 4px; align-self: stretch; margin: 0 3px; }
 @keyframes snap { 0% { transform: scale(1.04); } 60% { transform: scale(.985); } 100% { transform: scale(1); } }
 
 /* the argument chain, Scratch-style */
 #chain { position: relative; min-height: 220px; padding: 6px 4px 30px; }
-#chain .empty { color: var(--muted); text-align: center; padding: 40px 16px; border: 2px dashed var(--line); border-radius: 10px; }
+#chain .empty { color: var(--muted); text-align: center; padding: 40px 16px; border: 1.5px dashed var(--line); border-radius: 8px; }
 #chain .empty p { margin: 0 auto 8px; max-width: 46ch; }
 #chain .empty p:first-child { color: var(--ink); font-weight: 600; }
 #chain > .card { margin: 0; }
@@ -215,21 +235,29 @@ body.brief-open #brief-tab { display: none; }
 }
 #chain > .card.conn::before { top: -10px; border-radius: 4px 4px 0 0; }
 #chain > .card.conn::after { bottom: -10px; border-radius: 0 0 4px 4px; }
+/* empty connective slots get the same tabs, in dashed outline */
+.mode-connect #chain > .slot:not(.claim-slot, .rq-zone, .open-zone, .more-zone, .anchor-zone, .preview) { margin-top: 6px; margin-bottom: 6px; z-index: 2; }
+.mode-connect #chain > .slot:not(.claim-slot, .rq-zone, .open-zone, .more-zone, .anchor-zone)::before,
+.mode-connect #chain > .slot:not(.claim-slot, .rq-zone, .open-zone, .more-zone, .anchor-zone)::after {
+  content: ""; position: absolute; left: 20px; width: 18px; height: 12px; border: 1.5px dashed var(--conn-edge); background: var(--panel);
+}
+.mode-connect #chain > .slot:not(.claim-slot, .rq-zone, .open-zone, .more-zone, .anchor-zone)::before { top: -12px; border-bottom: none; border-radius: 4px 4px 0 0; }
+.mode-connect #chain > .slot:not(.claim-slot, .rq-zone, .open-zone, .more-zone, .anchor-zone)::after { bottom: -12px; border-top: none; border-radius: 0 0 4px 4px; }
 #chain > .card.claim + .card.claim, #chain > .card + .card.extract, #chain > .card.extract + .card { margin-top: 10px; }
 .mode-connect #chain > .card.claim + .card.claim { margin-top: 0; }
-.card.conn.interp { border-radius: 8px; font-weight: 400; }
+.card.conn.interp { border-radius: 6px; font-weight: 400; }
 .deck-conns .card.interp { flex: 1 1 260px; }
 #chain > .card.conn.interp { width: auto; max-width: none; margin: -4px 0 -4px 44px; }
 #chain > .card.extract + .card.conn.interp { margin-top: -4px; }
 .slot {
-  margin: 0 0 0 44px; height: 44px; width: min(320px, 75%); border: 2px dashed var(--conn-edge);
+  margin: 0 0 0 44px; height: 44px; width: min(320px, 75%); border: 1.5px dashed var(--conn-edge);
   border-radius: 20px; display: flex; align-items: center; justify-content: space-between; gap: 6px;
   padding: 0 6px 0 14px; color: var(--conn-edge); font-size: .88rem; background: transparent;
   position: relative;
 }
 .slot.hot { background: var(--conn); border-style: solid; }
 .slot.claim-slot {
-  margin: 0; width: auto; height: 52px; border-radius: 8px; border-color: var(--claim-edge); color: var(--claim-edge);
+  margin: 0; width: auto; height: 52px; border-radius: 6px; border-color: var(--claim-edge); color: var(--claim-ink);
   padding: 0 14px; position: relative; z-index: 1;
 }
 .slot.claim-slot.hot { background: var(--claim); }
@@ -242,6 +270,34 @@ body.brief-open #brief-tab { display: none; }
 .slot.anchor-zone.hot { background: var(--info-bg); border-color: var(--accent); }
 #chain > .card + .slot.anchor-zone, #chain > .slot.anchor-zone + .card { margin-top: 10px; }
 .slot .mini { color: var(--conn-edge); font-weight: 600; }
+.slot.rq-zone {
+  margin: 10px 0 0; width: auto; height: auto; min-height: 70px; border-radius: 8px; border-color: var(--claim-edge);
+  color: var(--muted); flex-direction: column; justify-content: center; gap: 2px; text-align: center; padding: 12px; font-size: .88rem;
+}
+.slot.rq-zone b { color: var(--ink); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+.slot.rq-zone.hot { background: var(--claim); }
+.card.claim.opening { background: var(--open); border-color: var(--open-edge); }
+.slot.open-zone {
+  margin: 0; width: auto; height: auto; min-height: 58px; border-radius: 6px; border-color: var(--open-edge);
+  color: var(--muted); flex-direction: column; justify-content: center; gap: 2px; text-align: center; padding: 10px; font-size: .88rem;
+}
+.slot.open-zone b { color: var(--open-ink); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+.slot.open-zone.hot { background: var(--open); }
+.slot.preview { opacity: .45; pointer-events: none; }
+.slot.claim-slot.next { height: auto; min-height: 96px; }
+.slot.more-zone {
+  margin: 6px 0 8px; min-height: 64px; width: auto; height: auto; padding: 10px 12px; border-radius: 8px; border-width: 1px;
+  border-color: var(--muted); color: var(--muted); justify-content: center; text-align: center; font-size: .85rem;
+}
+.slot.more-zone.hot { background: var(--info-bg); border-color: var(--accent); }
+/* small tags that sit on the top border of the opening claim, the gap and the research question */
+.open-label, .gap-label, .rq-label {
+  position: relative; top: -8px; z-index: 3; width: fit-content; margin: 0 12px -16px auto; padding: 0 6px; line-height: 16px;
+  background: var(--panel); border-radius: 4px; font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+}
+.open-label { color: var(--open-ink); }
+.gap-label { color: var(--muted); }
+.rq-label { color: var(--claim-ink); }
 .marker {
   position: absolute; left: 0; right: 0; height: 4px; background: var(--accent); border-radius: 2px;
   pointer-events: none; display: none; z-index: 5;
@@ -261,13 +317,13 @@ body.brief-open #brief-tab { display: none; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .btn:hover { filter: brightness(1.05); }
 .feedback { margin-top: 14px; display: grid; gap: 6px; }
-.fb { padding: 8px 12px; border-radius: 8px; font-size: .93rem; border-left: 4px solid; }
+.fb { padding: 8px 12px; border-radius: 6px; font-size: .93rem; border-left: 3px solid; }
 .fb.good { background: var(--good-bg); border-color: var(--good); }
 .fb.warn { background: var(--warn-bg); border-color: var(--warn); }
 .fb.bad { background: var(--bad-bg); border-color: var(--bad); }
 .fb.info { background: var(--info-bg); border-color: var(--muted); }
 .fb.win { background: var(--good-bg); border-color: var(--good); font-weight: 600; font-size: 1rem; }
-.model { margin-top: 14px; background: var(--info-bg); border-radius: 10px; padding: 12px 14px; font-size: .93rem; }
+.model { margin-top: 14px; background: var(--info-bg); border-radius: 8px; padding: 12px 14px; font-size: .93rem; }
 .model .steps { list-style: none; padding-left: 0; margin: 6px 0; }
 .model .steps li.link { padding-left: 1.5em; }
 .model .c { color: var(--conn-edge); font-weight: 600; }
@@ -350,7 +406,8 @@ a { color: var(--accent); }
     <p>These activities let you practise this on real papers:</p>
     <ul>
       <li><b>Try it first:</b> a short warm-up to learn how the page works.</li>
-      <li><b>Body Hair:</b> put the claims from a published Introduction in order, and link them.</li>
+      <li><b>Eating Disorders:</b> put the claims from a published Introduction in order, and link them. The connectives are laid out for you as clues.</li>
+      <li><b>Body Hair:</b> the same task with another published Introduction, built from scratch.</li>
       <li><b>Green Space:</b> build an Introduction for a made-up study from real sources, and write the gap yourself.</li>
       <li><b>Qualitative themes:</b> rebuild a published theme: claim, then extract and interpretation, extract and interpretation.</li>
     </ul>
@@ -372,20 +429,22 @@ const TASKS = [
     key: "t0",
     tab: "Try it first",
     mode: "connect",
+    scaffold: true,
     title: "Try it first: a short argument",
     intro: `
       <p>A warm-up to learn how the page works. The argument is a tiny Introduction: what we know, what we
       don't know, and the question the study asks.</p>
       <h3>How it works</h3>
       <ol>
-        <li>Move the five yellow claims from the deck into the column on the right. Drag them, or press the
-        <b>→</b> button on a card. Put them in the order that makes sense.</li>
-        <li>Once two claims sit next to each other, a blue slot appears between them. Drag a blue connective
-        into each slot (or press its <b>→</b>), or press <b>write your own</b> to type one.</li>
+        <li>The blue connectives are already in the column on the right, in order, as clues. Move the five
+        yellow claims from the deck into the yellow slots between them, so that every link makes sense. Drag a
+        claim, or press the <b>→</b> button on its card.</li>
+        <li>Want it harder? Press <b>Hide the connectives</b> (next to Check) and build it from scratch: put the
+        claims in order, then drag a blue connective into each blue slot between them, or press <b>write your own</b>.</li>
         <li>To change the order, drag a card, or use the <b>↑ ↓</b> arrows on it. The <b>×</b> sends it back to the deck.</li>
         <li>Press <b>Check</b> to get feedback. If you're stuck, <b>Show one good answer</b> lays out a model.</li>
       </ol>
-      <p>When you've got the hang of it, move on to <b>Body Hair</b>.</p>`,
+      <p>When you've got the hang of it, move on to <b>Eating Disorders</b>.</p>`,
     claims: {
       A: "Feeling part of a community matters to students at university.",
       B: "Students who feel they belong are more likely to stay on their course and do well.",
@@ -402,19 +461,101 @@ const TASKS = [
         questionnaire scores. That weighing produces the gap (D), and the question (E) fills the gap.</p>
         <p>Each connective says how the next claim follows: "There is evidence that" brings in support,
         "However," turns to a limitation, "As a result," shows the gap comes from that limitation, and
-        "So this study asks..." leads into the question. The Body Hair Introduction has the same shape, with more steps.</p>`,
+        "So this study asks..." leads into the question. The Eating Disorders Introduction has the same shape, with more steps.</p>`,
     },
     printIntro: `<p>Put the five claims in order, with a connective between each pair.</p>`,
     question: "E",
+    rqCards: ["E"],
     claimsHeading: "Claim cards",
     refs: [],
+  },
+  {
+    key: "t1r",
+    tab: "Eating Disorders",
+    mode: "connect",
+    // starts with the model's connectives laid out as clues; students fill the claim slots
+    scaffold: true,
+    title: "Put the claims in order (Rankin, Conti, Ramjan & Hay, 2025)",
+    intro: `
+      <h3>The study</h3>
+      <p>Rankin, Conti, Ramjan and Hay (2025) studied residential treatment for eating disorders: intensive,
+      24/7 care in a home-like setting rather than a hospital ward. They wanted to know what this kind of care
+      is like for the people who receive it.</p>
+      <p>Fifteen women who had been treated at Australia's first residential facility for eating disorders took
+      part in semi-structured interviews after they left. The authors analysed the interviews using reflexive
+      thematic analysis.</p>
+      <p>The cards come from the paper's Introduction, simplified. Your job is to rebuild the argument that
+      leads to their research question.</p>
+      <h3>What to do</h3>
+      <ol>
+        <li>The blue connectives are already laid out, in order, as clues. Drag a yellow claim into each yellow
+        slot so that every link makes sense. The argument should end with the research question.</li>
+        <li>Want it harder? Press <b>Hide the connectives</b> (next to Check) and build it from scratch: order the
+        claims, then drag a blue connective into each blue slot between them. Each connective can be used once, and there are spares.</li>
+        <li>Some cards make a claim; others are the evidence for a claim. Where does each piece of evidence go?</li>
+        <li>One card doesn't belong in this Introduction. Leave it in the deck. Which, and why?</li>
+        <li>Press <b>Check</b> for feedback. Then check your order against the paper (Introduction, PDF pp. 1-2).</li>
+      </ol>`,
+    claims: {
+      A: "About half of people treated as in-patients are still unwell 10-20 years later.",
+      B: "Residential care offers intensive 24/7 treatment in a home-like setting, focused on the person as well as their weight.",
+      C: "Eating disorders are serious and can be life-threatening.",
+      D: "How do people experience residential treatment for an eating disorder?",
+      E: "Many people don't recover, even after intensive treatment.",
+      F: "Reviews find that residential treatment improves both symptoms and quality of life.",
+      G: "Does residential treatment reduce symptoms more than in-patient care?",
+      H: "Around 8% of women and 2% of men have one at some point in their lives.",
+      J: "In-patient care focuses on weight, not the person, and patients say it leaves them feeling unheard.",
+      K: "We know little about what residential treatment is like for the people who receive it.",
+    },
+    conns: ["Globally,", "For example,", "Worse still,", "However,", "Follow-up studies show", "One reason may be that",
+      "By contrast,", "Early signs are good:", "There is evidence that", "Nonetheless,", "So far,", "Consequently, this study asks...",
+      "In addition,"],
+    leadIns: {
+      H: ["Globally,", "For example,"],
+      E: ["Worse still,"],
+      A: ["Follow-up studies show", "For example,"],
+      J: ["One reason may be that"],
+      B: ["By contrast,"],
+      F: ["Early signs are good:"],
+      K: ["Nonetheless,", "So far,"],
+      D: ["Consequently, this study asks..."],
+    },
+    belongsNot: {
+      G: "G asks whether residential treatment <i>works better</i> than in-patient care. That's a question about effects, which needs a trial comparing the two, not interviews. F already tells us about outcomes; the gap (K) is what treatment is like for the people in it.",
+    },
+    model: {
+      chain: ["C", "Globally,", "H", "Worse still,", "E", "Follow-up studies show", "A", "One reason may be that", "J",
+        "By contrast,", "B", "Early signs are good:", "F", "Nonetheless,", "K",
+        "Consequently, this study asks...", "D"],
+      notes: `
+        <p>This is the paper's order. Claims and evidence alternate: C is a claim and H backs it up; E is a claim and
+        A backs it up; B is a claim and F backs it up.</p>
+        <ul>
+          <li><b>The hourglass:</b> broad (eating disorders are serious) → narrower (treatment often fails; in-patient care doesn't fit) → residential care → gap → question.</li>
+          <li><b>Evidence comes straight after the claim it supports.</b> On its own, "8% of women" doesn't say why it matters; after C, it shows how common a serious illness is.</li>
+          <li><b>F → K:</b> the evidence (F) is about outcomes, measured by researchers. Weighing it shows what's missing: what the treatment is like for the people in it.</li>
+          <li><b>G</b> is a quantitative question. It sounds reasonable, but interviews can't answer it.</li>
+        </ul>`,
+    },
+    printIntro: `
+      <p>Nine <i>claim cards</i> (yellow) from the Introduction of Rankin, Conti, Ramjan and Hay (2025), simplified, one card that doesn't belong, and a deck of <i>connective cards</i> (blue).</p>
+      <ol>
+        <li>Put the claim cards in order, ending with the research question. Some cards are claims and some are the evidence for a claim.</li>
+        <li>Put one connective card in every gap between two claims. Each connective can be used once. There are spares.</li>
+        <li>One claim card doesn't belong in this Introduction. Which, and why?</li>
+        <li>Check your order against the paper (the Introduction, PDF pp. 1-2).</li>
+      </ol>`,
+    question: "D",
+    rqCards: ["D", "G"],
+    claimsHeading: "Claim cards (Rankin, Conti, Ramjan & Hay, 2025, simplified)",
+    blankConns: 2,
+    refs: ['Rankin, R., Conti, J., Ramjan, L., & Hay, P. (2025). "It takes a village": Patient lived experiences of residential treatment for an eating disorder. <i>BJPsych Open, 11</i>(1), e30. <a href="https://doi.org/10.1192/bjo.2024.849">doi:10.1192/bjo.2024.849</a>'],
   },
   {
     key: "t1",
     tab: "Body Hair",
     mode: "connect",
-    // starts with the model's connectives laid out as clues; students fill the claim slots
-    scaffold: true,
     title: "Put the claims in order (Braun, Tricklebank & Clarke, 2013)",
     intro: `
       <h3>The study</h3>
@@ -431,8 +572,8 @@ const TASKS = [
       <p>Every section except the Method makes <i>claims</i>, backs them with <i>evidence</i>, and <i>weighs</i> that evidence.
       In the Introduction, each claim is a step in the argument towards your research question.</p>
       <ol>
-        <li>The blue connectives are already laid out, in order, as clues. Drag a yellow claim into each yellow slot so that every link makes sense. The argument should end with the research question.</li>
-        <li>Want it harder? Press <b>Hide the connective clues</b> and build it from scratch: order the claims, then drag a blue connective into each blue slot between them. Each connective can be used once, and there are spares.</li>
+        <li>Put the yellow claims in order, building an argument that ends with the research question. Drag a blue connective into each blue slot between two claims. Each connective can be used once, and there are spares.</li>
+        <li>Stuck? Press <b>Hint: show the connectives</b> (next to Check) to lay the connectives out in order as clues, then drag a claim into each yellow slot.</li>
         <li>If no connective fits a slot, the order is wrong or a link is missing. Move things around, or press <b>write your own</b> in the slot.</li>
         <li>Press <b>Check</b> for feedback. Then check your order against the paper (Introduction, PDF pp. 1-4).</li>
       </ol>`,
@@ -486,6 +627,7 @@ const TASKS = [
         <li>Check your order against the paper (the Introduction, PDF pp. 1-4).</li>
       </ol>`,
     question: "G",
+    rqCards: ["G"],
     claimsHeading: "Claim cards (Braun, Tricklebank & Clarke, 2013, simplified)",
     blankConns: 2,
     refs: [BRAUN_REF],
@@ -496,7 +638,6 @@ const TASKS = [
     mode: "connect",
     // the blank gap card starts in the column: the argument builds up to it, the question follows it
     anchor: "GAP",
-    afterAnchor: ["K", "M"],
     title: "Extension: green-space cards (a made-up study, real sources)",
     intro: `
       <h3>The research area</h3>
@@ -596,6 +737,7 @@ const TASKS = [
         <li>When you're done, try a second order. Which connectives had to move?</li>
       </ol>`,
     question: "M",
+    rqCards: ["K", "M"],
     claimsHeading: "Claim cards",
     blankConns: 2,
     refs: [
@@ -709,7 +851,11 @@ const scaffoldChain = t => {
 const newState = t => Object.assign(freshState(),
   t.scaffold ? { chain: scaffoldChain(t), clues: true } : {},
   t.anchor ? { chain: [t.anchor] } : {});
-const S = () => (saved[current] = saved[current] || newState(task()));
+// a tab saved before it had connective clues starts again with them
+const S = () => {
+  const t = task(), st = saved[current];
+  return (saved[current] = st && !(t.scaffold && st.clues === undefined) ? st : Object.assign(newState(t), st && { introSeen: st.introSeen }));
+};
 
 // all items for a task, as {id: item}
 const itemsFor = (t, st) => {
@@ -738,7 +884,8 @@ const app = document.getElementById("app");
 const renderTabs = () => {
   document.getElementById("tabs").innerHTML = TASKS.map(t =>
     `<button role="tab" aria-selected="${t.key === current}" data-tab="${t.key}">${t.tab}</button>`).join("") +
-    `<button class="reset" data-act="reset" title="Clear everything on this tab">Start again</button>`;
+    `<button class="reset print-link" data-act="print" title="Print this task as cut-out cards">Print cards</button>` +
+    `<button class="reset" data-act="reset" title="Clear everything on this tab. Triple-click to clear every tab.">Start again</button>`;
 };
 
 const cardHTML = (item, st, where, ci) => {
@@ -769,41 +916,63 @@ const render = () => {
   const t = task(), st = S(), items = itemsFor(t, st);
   // drop saved cards that no longer exist after the card set is edited
   st.chain = st.chain.filter(id => items[id]);
+  if (!st.chain.length || items[st.chain[st.chain.length - 1]].kind === "conn") st.rqSet = false;
   saved.current = current;
   renderTabs();
   const placed = new Set(st.chain);
-  const pool = Object.values(items).filter(i => !placed.has(i.id));
+  // the deck keeps the student's own order once they've rearranged it
+  const order = st.order || [], rank = id => { const r = order.indexOf(id); return r < 0 ? Infinity : r; };
+  const pool = Object.values(items).filter(i => !placed.has(i.id)).sort((a, b) => rank(a.id) - rank(b.id));
   const poolClaims = pool.filter(i => i.kind !== "conn");
   const poolConns = pool.filter(i => i.kind === "conn");
 
   let chainHTML = "";
-  const claimSlot = i => {
-    const m = st.marks["cslot" + i] ? ` mark-${st.marks["cslot" + i]}` : "";
-    return `<div class="slot claim-slot${m}" data-slot="${i}" data-accept="claim"><span>drop a claim here</span></div>`;
-  };
+  const isConnect = t.mode === "connect";
+  const mk = k => st.marks[k] ? ` mark-${st.marks[k]}` : "";
+  const claimSlot = (i, label = "drop a claim here", cls = "") =>
+    `<div class="slot claim-slot${cls}${mk("cslot" + i)}" data-slot="${i}" data-accept="claim"><span>${label}</span></div>`;
+  const connSlot = i =>
+    `<div class="slot${mk("slot" + i)}" data-slot="${i}" data-accept="conn"><span>drop a connective here</span><button class="mini" data-act="own" data-index="${i}">+ write your own</button></div>`;
+  // the opening claim gets its own space and colour; until the argument has two claims, empty slots show
+  // where the next connective and claim go; after that, a "more" zone says the argument can keep growing
+  const openingZone = `<div class="slot open-zone${mk("cslot0")}" data-slot="0" data-accept="claim"><b>Opening claim</b><span>Put your opening claim here: where the argument starts.</span></div>`;
+  const preview = `<div class="slot preview"><span>then a connective</span></div><div class="slot claim-slot preview"><span>then the next claim</span></div>`;
+  const rqAt = st.rqSet ? st.chain.length - 1 : -1;
+  const body = st.chain.filter((id, i) => items[id].kind !== "conn" && id !== t.anchor && i !== rqAt);
+  const first = st.chain[0];
+  const opening = isConnect && first && items[first].kind !== "conn" && first !== t.anchor && rqAt !== 0;
+  const guide = isConnect && !st.clues;
+  const anchorAt = t.anchor ? st.chain.indexOf(t.anchor) : -1;
+  const moreAt = guide && body.length >= 2 ? (anchorAt > 0 ? anchorAt : rqAt >= 0 ? rqAt : st.chain.length) : -1;
+  const moreZone = `<div class="slot more-zone" data-slot="${moreAt}" data-accept="any"><span>+ Keep going: drag more claims and connectives here, or between any two cards</span></div>`;
+  if (isConnect && !opening && (!first || items[first].kind !== "conn")) chainHTML += openingZone + (guide && !body.length ? preview : "");
   st.chain.forEach((id, i) => {
     const prev = st.chain[i - 1];
-    if (t.mode === "connect" && i > 0 && items[prev].kind !== "conn" && items[id].kind !== "conn") {
-      const m = st.marks["slot" + i] ? ` mark-${st.marks["slot" + i]}` : "";
-      chainHTML += `<div class="slot${m}" data-slot="${i}" data-accept="conn"><span>drop a connective here</span><button class="mini" data-act="own" data-index="${i}">+ write your own</button></div>`;
-    }
-    if (t.mode === "connect" && items[id].kind === "conn" && (i === 0 || items[prev].kind === "conn")) chainHTML += claimSlot(i);
-    if (id === t.anchor && i === 0) chainHTML += `<div class="slot anchor-zone" data-slot="0" data-accept="any"><b>Build the argument here</b><span>Drag claims and connectives above the gap: what we know, and what kind of evidence it is.</span></div>`;
-    chainHTML += cardHTML(items[id], st, "chain", i);
+    if (i === moreAt) chainHTML += moreZone;
+    if (isConnect && i > 0 && items[prev].kind !== "conn" && items[id].kind !== "conn") chainHTML += connSlot(i);
+    if (isConnect && items[id].kind === "conn" && (i === 0 || items[prev].kind === "conn")) chainHTML += i === 0 ? openingZone : claimSlot(i);
+    if (st.rqSet && i === rqAt) chainHTML += `<div class="rq-label">Research question</div>`;
+    if (id === t.anchor && i > 0) chainHTML += `<div class="gap-label">The gap</div>`;
+    if (opening && i === 0) chainHTML += `<div class="open-label">Opening claim</div>`;
+    const html = cardHTML(items[id], st, "chain", i);
+    chainHTML += opening && i === 0 ? html.replace('class="card ', 'class="card opening ') : html;
     const next = st.chain[i + 1];
+    if (guide && body.length === 1 && opening) {
+      if (i === 0 && (!next || items[next].kind !== "conn")) chainHTML += connSlot(1) + claimSlot(1, "drop the next claim here", " next");
+      if (i === 1 && items[id].kind === "conn" && (!next || items[next].kind !== "conn")) chainHTML += claimSlot(2, "drop the next claim here", " next");
+    }
     if (t.mode === "theme" && items[id].kind === "extract" && (!next || items[next].kind !== "conn")) {
-      const m = st.marks["slot" + (i + 1)] ? ` mark-${st.marks["slot" + (i + 1)]}` : "";
-      chainHTML += `<div class="slot${m}" data-slot="${i + 1}" data-accept="conn"><span>drop an interpretation here</span><button class="mini" data-act="own" data-index="${i + 1}">+ write your own</button></div>`;
+      chainHTML += `<div class="slot${mk("slot" + (i + 1))}" data-slot="${i + 1}" data-accept="conn"><span>drop an interpretation here</span><button class="mini" data-act="own" data-index="${i + 1}">+ write your own</button></div>`;
     }
   });
-  const lastId = st.chain[st.chain.length - 1];
-  if (lastId === t.anchor) chainHTML += `<div class="slot anchor-zone" data-slot="${st.chain.length}" data-accept="any"><b>Put the research question here</b><span>It should follow from the gap.</span></div>`;
-  if (t.mode === "connect" && lastId && items[lastId].kind === "conn") chainHTML += claimSlot(st.chain.length);
-  if (!st.chain.length) chainHTML = t.mode === "theme"
-    ? `<div class="empty"><p>Drag cards here to build the theme, starting with the claim.</p>
+  if (moreAt === st.chain.length) chainHTML += moreZone;
+  // the research-question space: an empty drop zone at the end, or the pinned question card
+  if (isConnect && !st.rqSet) {
+    chainHTML += `<div class="slot rq-zone${mk("cslot" + st.chain.length)}" data-slot="${st.chain.length}" data-accept="claim" data-rq="1"><b>Research question</b><span>Put the research question here. The argument ends with it.</span></div>`;
+  }
+  if (!st.chain.length && !isConnect) chainHTML = `<div class="empty"><p>Drag cards here to build the theme, starting with the claim.</p>
         <p>A theme is a claim, supported by evidence from the data (extracts) and your interpretation of each extract.</p>
-        <p>Use at least three extracts, each followed by its interpretation.</p></div>`
-    : `<div class="empty">Drag cards here to build the argument, ending with the research question.</div>`;
+        <p>Use at least three extracts, each followed by its interpretation.</p></div>`;
 
   const fb = st.feedback ? `<div class="feedback">${st.feedback.map(f => `<div class="fb ${f.level}">${f.msg}</div>`).join("")}</div>` : "";
   const model = st.showModel ? modelHTML(t, items) : "";
@@ -825,15 +994,14 @@ const render = () => {
           <h2>Your ${t.mode === "theme" ? "theme write-up" : "argument"}
             <span class="chain-head">
               ${t.mode === "theme" ? `<button class="mini" data-act="hideext">${st.hideExtracts ? "Show the extracts" : "Hide the extracts"}</button>` : ""}
-              ${t.scaffold ? `<button class="mini" data-act="clues">${st.clues ? "Hide the connective clues" : "Show the connectives as clues"}</button>` : ""}
               <button class="mini" data-act="copy">Copy as text</button>
             </span></h2>
           <div id="chain">${chainHTML}<div class="marker" id="marker"></div></div>
         </div>
         <div class="actions">
           <button class="btn primary" data-act="check">Check</button>
+          ${t.mode === "connect" && !t.anchor ? `<button class="btn" data-act="clues">${st.clues ? "Hide the connectives" : "Hint: show the connectives"}</button>` : ""}
           <button class="btn" data-act="model">${st.showModel ? "Hide one good answer" : "Show one good answer"}</button>
-          <button class="btn" data-act="print" title="Print this task as cut-out cards">Print cards</button>
         </div>
         ${fb}${model}
       </section>
@@ -898,11 +1066,21 @@ const autosize = ta => { ta.style.height = "auto"; ta.style.height = ta.scrollHe
 
 const clearMarks = st => { st.marks = {}; st.feedback = null; };
 
-const move = (id, zone, index) => {
+// rq: put the card in the research-question space. Once that's filled, nothing goes below it.
+// before: for the deck, the card to drop it in front of (none: the end)
+const move = (id, zone, index, rq = false, before = null) => {
   const st = S();
+  if (zone === "pool" && (before || st.chain.indexOf(id) < 0)) {
+    const order = (st.order || Object.keys(itemsFor(task(), st))).filter(x => x !== id);
+    const at = before ? order.indexOf(before) : -1;
+    order.splice(at < 0 ? order.length : at, 0, id);
+    st.order = order;
+  }
   const ci = st.chain.indexOf(id);
+  if (st.rqSet && ci === st.chain.length - 1) st.rqSet = false;
   if (ci >= 0) { st.chain.splice(ci, 1); if (zone === "chain" && index > ci) index--; }
-  if (zone === "chain") st.chain.splice(Math.max(0, Math.min(index, st.chain.length)), 0, id);
+  if (zone === "chain" && rq) { st.chain.push(id); st.rqSet = true; }
+  else if (zone === "chain") st.chain.splice(Math.max(0, Math.min(index, st.chain.length - (st.rqSet ? 1 : 0))), 0, id);
   clearMarks(st);
   render();
   const el = app.querySelector(`[data-item="${id}"]`);
@@ -928,9 +1106,17 @@ const findTarget = (x, y) => {
   if (!under) return null;
   const items = itemsFor(task(), S());
   const slot = under.closest(".slot");
-  if (slot && (slot.dataset.accept === "any" || (slot.dataset.accept === "conn") === (items[drag.id].kind === "conn"))) return { zone: "chain", index: +slot.dataset.slot, slot };
+  if (slot && slot.dataset.accept && (slot.dataset.accept === "any" || (slot.dataset.accept === "conn") === (items[drag.id].kind === "conn"))) return { zone: "chain", index: +slot.dataset.slot, slot, rq: !!slot.dataset.rq };
   const zone = under.closest("[data-zone]");
   if (!zone) return null;
+  if (zone.dataset.zone === "pool") {
+    // reorder within the deck: claims among claims, connectives among connectives
+    const group = drag.el.closest(".deck-claims, .deck-conns")
+      || document.querySelector(items[drag.id].kind === "conn" ? "#deck .deck-conns" : "#deck .deck-claims");
+    const cards = [...group.querySelectorAll(":scope > [data-item]")].filter(c => c !== drag.el);
+    const hit = cards.find(c => { const r = c.getBoundingClientRect(); return y < r.top || (y <= r.bottom && x < r.left + r.width / 2); });
+    return { zone: "pool", deckBefore: hit, deckLast: hit ? null : cards[cards.length - 1] };
+  }
   if (zone.dataset.zone !== "chain") return { zone: zone.dataset.zone };
   const cards = [...document.querySelectorAll("#chain > [data-ci]")].filter(c => c !== drag.el);
   const hit = cards.find(c => { const r = c.getBoundingClientRect(); return y < r.top + r.height / 2; });
@@ -940,10 +1126,21 @@ const findTarget = (x, y) => {
 
 const showTarget = t => {
   document.querySelectorAll(".hot").forEach(el => el.classList.remove("hot"));
+  // keep the deck's insertion bar where it is if it's already in the right place, so it doesn't flicker
+  const gap = document.querySelector(".deck-gap");
+  if (gap && !(t?.deckBefore && gap.nextElementSibling === t.deckBefore) && !(t?.deckLast && gap.previousElementSibling === t.deckLast)) gap.remove();
   const m = marker();
   if (m) m.style.display = "none";
   if (!t) return;
   if (t.slot) { t.slot.classList.add("hot"); return; }
+  if (t.deckBefore || t.deckLast) {
+    if (!document.querySelector(".deck-gap")) {
+      const bar = document.createElement("div");
+      bar.className = "deck-gap";
+      if (t.deckBefore) t.deckBefore.before(bar); else t.deckLast.after(bar);
+    }
+    return;
+  }
   if (t.zone !== "chain") { document.querySelector(`[data-zone="${t.zone}"]`).classList.add("hot"); return; }
   const chain = document.getElementById("chain"), cr = chain.getBoundingClientRect();
   const ref = t.before || t.last;
@@ -958,6 +1155,9 @@ document.addEventListener("pointermove", e => {
   if (!drag.started) {
     if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) return;
     drag.started = true;
+    // nothing on the page gets text-selected while a card is being dragged across it
+    document.body.classList.add("is-dragging");
+    window.getSelection()?.removeAllRanges();
     drag.ghost = drag.el.cloneNode(true);
     drag.ghost.classList.add("ghost");
     drag.ghost.style.width = drag.w + "px";
@@ -977,16 +1177,18 @@ const endDrag = () => {
   if (!drag) return;
   const d = drag; drag = null;
   if (!d.started) return;
+  document.body.classList.remove("is-dragging");
   d.ghost.remove();
   d.el.classList.remove("dragging");
   showTarget(null);
-  if (d.target) move(d.id, d.target.zone, d.target.index);
+  if (d.target) move(d.id, d.target.zone, d.target.index, d.target.rq, d.target.deckBefore?.dataset.item);
 };
 document.addEventListener("pointerup", endDrag);
-document.addEventListener("pointercancel", () => { if (drag?.started) { drag.ghost.remove(); drag.el.classList.remove("dragging"); showTarget(null); } drag = null; });
+document.addEventListener("pointercancel", () => { if (drag?.started) { document.body.classList.remove("is-dragging"); drag.ghost.remove(); drag.el.classList.remove("dragging"); showTarget(null); } drag = null; });
 
 // ---------- buttons and typing ----------
 
+let resetTimer;
 document.addEventListener("click", e => {
   const tab = e.target.closest("[data-tab]");
   if (tab) { current = tab.dataset.tab; render(); return; }
@@ -997,13 +1199,14 @@ document.addEventListener("click", e => {
   const id = card?.dataset.item;
   const ci = id ? st.chain.indexOf(id) : -1;
   const acts = {
-    // with an anchor card in place, new cards go before it (questions go after it)
-    // otherwise the first empty slot that takes this kind of card, so it doesn't land below the clues
+    // questions go to the research-question space while it's empty; other cards go to the first empty
+    // slot that takes them (so they don't land below the clues), else before the anchor card, else at the end
     add: () => {
+      if ((t.rqCards || []).includes(id) && !st.rqSet) return move(id, "chain", st.chain.length, true);
       const accept = card.classList.contains("conn") ? "conn" : "claim";
-      const slot = app.querySelector(`#chain .slot[data-accept="${accept}"]:not(.anchor-zone)`);
+      const slot = app.querySelector(`#chain .slot[data-accept="${accept}"]:not(.anchor-zone):not(.rq-zone)`);
       move(id, "chain", slot ? +slot.dataset.slot
-        : t.anchor && st.chain.includes(t.anchor) && !t.afterAnchor.includes(id) ? st.chain.indexOf(t.anchor)
+        : t.anchor && st.chain.includes(t.anchor) ? st.chain.indexOf(t.anchor)
         : st.chain.length);
     },
     out: () => move(id, "pool"),
@@ -1015,10 +1218,18 @@ document.addEventListener("click", e => {
     own: () => { const nid = newCustom(st); move(nid, "chain", +btn.dataset.index); focusText(nid); },
     check: () => { runCheck(t, st); render(); app.querySelector(".feedback")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); },
     model: () => { st.showModel = !st.showModel; render(); },
-    reset: () => { if (confirm(`Clear everything on the ${t.tab} tab and start again?`)) { saved[current] = newState(t); render(); } },
+    // one click clears this tab; a triple click clears every tab. Wait to see how many clicks there are.
+    reset: () => {
+      clearTimeout(resetTimer);
+      const clicks = e.detail;
+      resetTimer = setTimeout(() => {
+        if (clicks >= 3) { if (confirm("Clear your work on every tab and start again?")) { TASKS.forEach(x => delete saved[x.key]); render(); } }
+        else if (confirm(`Clear everything on the ${t.tab} tab and start again?`)) { saved[current] = newState(t); render(); }
+      }, 400);
+    },
     clues: () => {
       if (st.chain.some(x => itemsFor(t, st)[x].kind !== "conn") && !confirm("This clears the claims you've placed. Carry on?")) return;
-      saved[current] = Object.assign(newState(t), st.clues ? { chain: [], clues: false } : {}, { introSeen: true });
+      saved[current] = Object.assign(freshState(), st.clues ? { clues: false } : { chain: scaffoldChain(t), clues: true }, { introSeen: true, order: st.order });
       render();
     },
     hideext: () => { st.hideExtracts = !st.hideExtracts; render(); },
@@ -1075,6 +1286,7 @@ const loadModel = t => {
   if (t.gap) st.texts[t.gap.id] = t.model.gapText;
   st.clues = !!t.scaffold;
   st.showModel = true;
+  st.rqSet = t.mode === "connect";
   st.introSeen = true;
   saved[current] = st;
   render();
@@ -1114,14 +1326,14 @@ const runCheck = (t, st) => {
 
   if (t.mode === "connect") {
     checkLinks(t, st, items, add, mark);
-    ({ t0: checkDemo, t1: checkBraun, t1x: checkGreen })[t.key](t, st, items, { add, mark, pos, has, L, claims });
+    ({ t0: checkDemo, t1: checkBraun, t1r: checkRankin, t1x: checkGreen })[t.key](t, st, items, { add, mark, pos, has, L, claims });
   } else {
     checkTheme(t, st, items, { add, mark, pos, has, L, claims });
   }
 
   const bad = fb.filter(f => f.level === "bad").length, warn = fb.filter(f => f.level === "warn").length;
   if (!bad && !warn && !unplaced.length) fb.unshift({ level: "win", msg: t.key === "t0"
-    ? "That's it: why it matters, the evidence, what the evidence can't tell us, the gap, then the question, each joined by a connective that says how. Now try the Body Hair tab, which has the same shape with more steps."
+    ? "That's it: why it matters, the evidence, what the evidence can't tell us, the gap, then the question, each joined by a connective that says how. Now try the Eating Disorders tab, which has the same shape with more steps."
     : t.mode === "connect"
     ? "This works: every claim follows from the one before, and the links say how. Now copy it as text and turn it into a paragraph."
     : "This works: claim, extract-interpretation pairs, an edge and a summary. Now press Hide the extracts and read it aloud." });
@@ -1146,9 +1358,9 @@ const checkLinks = (t, st, items, add, mark) => {
     if (it.kind !== "conn" || !next || items[next].kind === "conn" || items[prev].kind === "conn") return;
     const txt = textOf(it, st);
     if (it.custom) { if (txt) mark(id, "good"); else { empty++; mark(id, "bad"); } return; }
-    if (txt === "So this study asks..." && next !== t.question) {
+    if (/this study asks/.test(txt) && next !== t.question) {
       mark(id, "bad");
-      add("bad", `"<i>So this study asks...</i>" has to lead into the research question (${items[t.question].letter}), not ${items[next].letter}.`);
+      add("bad", `"<i>${txt}</i>" has to lead into the research question (${items[t.question].letter}), not ${items[next].letter}.`);
       return;
     }
     if ((t.leadIns[next] || []).includes(txt)) mark(id, "good"); else unmarked++;
@@ -1181,6 +1393,25 @@ const checkBraun = (t, st, items, { add, mark, pos, has, L, claims }) => {
   if (has("K") && has("G") && pos("G") - pos("K") === 1) add("good", "Gap → question: K leads straight into G.");
   const firsts = { E: "You opened with E, the risks and costs of hair removal. That starts with why the topic matters. Compare it with the model answer, which opens with C: which connectives did you have to change, and which stayed the same?", C: "You opened with C, the big idea that culture shapes how we see our bodies. That gives the reader the background first, before you narrow down to body hair." };
   if (firsts[claims[0]]) add("good", firsts[claims[0]]);
+};
+
+const checkRankin = (t, st, items, { add, mark, pos, has, L, claims }) => {
+  if (has("D")) {
+    if (claims[claims.length - 1] === "D") { mark("D", "good"); add("good", "The research question (D) ends the argument: everything before it builds towards it."); }
+    else { mark("D", "bad"); add("bad", "The research question (D) should come last. Everything else is a step towards it."); }
+  }
+  [["H", "C"], ["A", "E"], ["F", "B"]].forEach(([ev, cl]) => {
+    if (!has(ev) || !has(cl)) return;
+    if (pos(ev) < pos(cl)) { mark(ev, "bad"); add("bad", `${L(ev)} is evidence for ${L(cl)}, so it comes after the claim it supports.`); }
+    else if (pos(ev) - pos(cl) === 1) mark(ev, "good");
+    else { mark(ev, "warn"); add("warn", `${L(ev)} is evidence for ${L(cl)}. Put it straight after ${L(cl)}, so the reader sees what it backs up.`); }
+  });
+  if (has("K") && has("F")) {
+    if (pos("K") < pos("F")) { mark("K", "bad"); add("bad", `${L("K")} is the gap, and it comes from weighing the evidence. Say what we do know (${L("F")}) first.`); }
+    else if (pos("K") - pos("F") === 1) { mark("K", "good"); add("good", `${L("F")} → ${L("K")}: the evidence is about outcomes, and that's what produces the gap.`); }
+  }
+  if (has("J") && has("B") && pos("B") < pos("J")) { mark("B", "warn"); add("warn", `${L("B")} (residential care) is the response to the problems with in-patient care (${L("J")}), so it usually comes after them.`); }
+  if (claims[0] === "C") add("good", "You opened with C: eating disorders are serious. That tells the reader straight away why the topic matters.");
 };
 
 const checkGreen = (t, st, items, { add, mark, pos, has, L, claims }) => {

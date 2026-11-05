@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qualitative Resources</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1f2328; --muted: #5d6470; --line: #d8d6cf; --accent: #2463c7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17191d; --panel: #20242a; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47; --accent: #6ea8ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17191d; --panel: #20242a; --ink: #e8e6e1; --muted: #a3a9b3; --line: #3a3f47; --accent: #6ea8ff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+main { max-width: 720px; margin: 0 auto; padding: 40px 16px; }
+h1 { font-size: 1.5rem; margin: 0 0 6px; }
+.sub { color: var(--muted); margin: 0 0 28px; }
+ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+a.item {
+  display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 18px; color: inherit; text-decoration: none;
+}
+a.item:hover { border-color: var(--accent); }
+a.item b { color: var(--accent); font-size: 1.05rem; }
+a.item span { display: block; color: var(--muted); margin-top: 4px; font-size: .95rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Qualitative resources</h1>
+  <p class="sub">Interactive activities for PSYC611, qualitative strand.</p>
+  <ul>
+    <li><a class="item" href="build-an-argument/">
+      <b>Build an argument</b>
+      <span>Order claims, evidence and interpretations into an argument, for an Introduction and for a theme in the Results.</span>
+    </a></li>
+  </ul>
+</main>
+</body>
+</html>

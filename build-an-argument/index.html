@@ -349,6 +349,7 @@ a { color: var(--accent); }
     has to do the analysis for you.</p>
     <p>These activities let you practise this on real papers:</p>
     <ul>
+      <li><b>Try it first:</b> a short warm-up to learn how the page works.</li>
       <li><b>Body Hair:</b> put the claims from a published Introduction in order, and link them.</li>
       <li><b>Green Space:</b> build an Introduction for a made-up study from real sources, and write the gap yourself.</li>
       <li><b>Qualitative themes:</b> rebuild a published theme: claim, then extract and interpretation, extract and interpretation.</li>
@@ -367,6 +368,47 @@ a { color: var(--accent); }
 const BRAUN_REF = 'Braun, V., Tricklebank, G., & Clarke, V. (2013). "It shouldn\'t stick out from your bikini at the beach": Meaning, gender, and the hairy/hairless body. <i>Psychology of Women Quarterly, 37</i>(4), 478-493. <a href="https://doi.org/10.1177/0361684313492950">doi:10.1177/0361684313492950</a>';
 
 const TASKS = [
+  {
+    key: "t0",
+    tab: "Try it first",
+    mode: "connect",
+    title: "Try it first: a short argument",
+    intro: `
+      <p>A warm-up to learn how the page works. The argument is a tiny Introduction: what we know, what we
+      don't know, and the question the study asks.</p>
+      <h3>How it works</h3>
+      <ol>
+        <li>Move the five yellow claims from the deck into the column on the right. Drag them, or press the
+        <b>→</b> button on a card. Put them in the order that makes sense.</li>
+        <li>Once two claims sit next to each other, a blue slot appears between them. Drag a blue connective
+        into each slot (or press its <b>→</b>), or press <b>write your own</b> to type one.</li>
+        <li>To change the order, drag a card, or use the <b>↑ ↓</b> arrows on it. The <b>×</b> sends it back to the deck.</li>
+        <li>Press <b>Check</b> to get feedback. If you're stuck, <b>Show one good answer</b> lays out a model.</li>
+      </ol>
+      <p>When you've got the hang of it, move on to <b>Body Hair</b>.</p>`,
+    claims: {
+      A: "Feeling part of a community matters to students at university.",
+      B: "Students who feel they belong are more likely to stay on their course and do well.",
+      C: "Most of these studies measure belonging with a questionnaire score.",
+      D: "We know little about how students themselves build a sense of community.",
+      E: "How do students describe finding their community at university?",
+    },
+    conns: ["There is evidence that", "However,", "As a result,", "So this study asks..."],
+    leadIns: { B: ["There is evidence that"], C: ["However,"], D: ["As a result,"], E: ["So this study asks..."] },
+    model: {
+      chain: ["A", "There is evidence that", "B", "However,", "C", "As a result,", "D", "So this study asks...", "E"],
+      notes: `
+        <p>A says why the topic matters. B is the evidence for it, and C weighs that evidence: it's mostly
+        questionnaire scores. That weighing produces the gap (D), and the question (E) fills the gap.</p>
+        <p>Each connective says how the next claim follows: "There is evidence that" brings in support,
+        "However," turns to a limitation, "As a result," shows the gap comes from that limitation, and
+        "So this study asks..." leads into the question. The Body Hair Introduction has the same shape, with more steps.</p>`,
+    },
+    printIntro: `<p>Put the five claims in order, with a connective between each pair.</p>`,
+    question: "E",
+    claimsHeading: "Claim cards",
+    refs: [],
+  },
   {
     key: "t1",
     tab: "Body Hair",
@@ -654,7 +696,7 @@ let saved = load();
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (e) { /* storage unavailable */ } };
 
 const freshState = () => ({ chain: [], custom: {}, texts: {}, seq: 0, marks: {}, feedback: null, showModel: false, weighOpen: {}, hideExtracts: false });
-let current = saved.current && TASKS.some(t => t.key === saved.current) ? saved.current : "t1";
+let current = saved.current && TASKS.some(t => t.key === saved.current) ? saved.current : "t0";
 const task = () => TASKS.find(t => t.key === current);
 const scaffoldChain = t => {
   const items = itemsFor(t, freshState()), used = new Set();
@@ -803,7 +845,7 @@ const render = () => {
      <p>Drag cards into the column on the right. ${t.mode === "connect"
        ? "Yellow cards are claims; blue cards are connectives."
        : ""}</p>` + t.intro +
-    `<div class="refs"><h3>Source${t.refs.length > 1 ? "s" : ""}</h3>${t.refs.map(r => `<p>${r}</p>`).join("")}
+    `<div class="refs">${t.refs.length ? `<h3>Source${t.refs.length > 1 ? "s" : ""}</h3>${t.refs.map(r => `<p>${r}</p>`).join("")}` : ""}
      <p>Your work is saved in this browser only.</p></div>`;
   // the briefing opens by itself the first time each tab is visited
   if (!st.introSeen && saved.welcomeSeen) { st.introSeen = true; setBrief(true); }
@@ -828,7 +870,7 @@ const printHTML = t => {
       <p class="note">Printing: one set per pair. Claim cards on yellow paper and connectives on blue, if available. Cut along the dashed lines.</p></section>
     <section class="pp"><h3>${t.claimsHeading}</h3><div class="grid">${cards.map(card).join("")}${interps}</div></section>
     ${conns ? `<section class="pp"><h3>Connective cards</h3><div class="grid">${conns}</div></section>` : ""}
-    <section class="pp refs"><h3>Source${t.refs.length > 1 ? "s" : ""}</h3>${t.refs.map(r => `<p>${r}</p>`).join("")}</section>`;
+    ${t.refs.length ? `<section class="pp refs"><h3>Source${t.refs.length > 1 ? "s" : ""}</h3>${t.refs.map(r => `<p>${r}</p>`).join("")}</section>` : ""}`;
 };
 
 const modelHTML = (t, items) => {
@@ -1072,13 +1114,15 @@ const runCheck = (t, st) => {
 
   if (t.mode === "connect") {
     checkLinks(t, st, items, add, mark);
-    (t.key === "t1" ? checkBraun : checkGreen)(t, st, items, { add, mark, pos, has, L, claims });
+    ({ t0: checkDemo, t1: checkBraun, t1x: checkGreen })[t.key](t, st, items, { add, mark, pos, has, L, claims });
   } else {
     checkTheme(t, st, items, { add, mark, pos, has, L, claims });
   }
 
   const bad = fb.filter(f => f.level === "bad").length, warn = fb.filter(f => f.level === "warn").length;
-  if (!bad && !warn && !unplaced.length) fb.unshift({ level: "win", msg: t.mode === "connect"
+  if (!bad && !warn && !unplaced.length) fb.unshift({ level: "win", msg: t.key === "t0"
+    ? "That's it: why it matters, the evidence, what the evidence can't tell us, the gap, then the question, each joined by a connective that says how. Now try the Body Hair tab, which has the same shape with more steps."
+    : t.mode === "connect"
     ? "This works: every claim follows from the one before, and the links say how. Now copy it as text and turn it into a paragraph."
     : "This works: claim, extract-interpretation pairs, an edge and a summary. Now press Hide the extracts and read it aloud." });
   else if (!bad && !unplaced.length) fb.unshift({ level: "info", msg: "Nearly there: no outright problems, but have a look at the amber points." });
@@ -1113,6 +1157,15 @@ const checkLinks = (t, st, items, add, mark) => {
   if (doubled) add("bad", `${doubled} connective${doubled > 1 ? "s have" : " has"} no claim next to ${doubled > 1 ? "them" : "it"} (the yellow dashed slot${doubled > 1 ? "s" : ""}). Every connective needs a claim on each side.`);
   if (empty) add("bad", "One of your own connectives is empty. Type it, or replace it with a printed one.");
   if (unmarked) add("info", "Connectives with a green ring are ones we expected. Ones without a ring aren't necessarily wrong: read each pair of claims aloud with the link between them. Does it say <i>how</i> the second follows from the first?");
+};
+
+const checkDemo = (t, st, items, { add, mark, pos, has, L, claims }) => {
+  if (has("E")) {
+    if (claims[claims.length - 1] === "E") { mark("E", "good"); add("good", "The research question (E) comes last: the argument leads up to it."); }
+    else { mark("E", "bad"); add("bad", "The research question (E) should come last. The other claims explain why we need to ask it."); }
+  }
+  if (has("B") && has("C") && pos("C") < pos("B")) { mark("C", "bad"); add("bad", `${L("C")} weighs the evidence ("these studies"), so the evidence (${L("B")}) has to come before it.`); }
+  if (has("D") && has("B") && pos("D") < pos("B")) { mark("D", "bad"); add("bad", `${L("D")} is the gap: what we don't know yet. Say what we do know (${L("B")}) first.`); }
 };
 
 const checkBraun = (t, st, items, { add, mark, pos, has, L, claims }) => {

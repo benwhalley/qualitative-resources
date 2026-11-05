@@ -393,8 +393,7 @@ const TASKS = [
         <li>Want it harder? Press <b>Hide the connective clues</b> and build it from scratch: order the claims, then drag a blue connective into each blue slot between them. Each connective can be used once, and there are spares.</li>
         <li>If no connective fits a slot, the order is wrong or a link is missing. Move things around, or press <b>write your own</b> in the slot.</li>
         <li>Press <b>Check</b> for feedback. Then check your order against the paper (Introduction, PDF pp. 1-4).</li>
-      </ol>
-      <p><b>Round 2:</b> try the authors' own structure. In the paper, <i>why this matters</i> (card E: health risks, costs, a new body norm) comes after the research question, as a separate rationale. Move E to the end. Which connectives had to move, and which stayed put?</p>`,
+      </ol>`,
     // cut cards, kept here in case we want them back:
     //   F (cut later, the authors' opening hook): "Clinicians report that it is now unusual to
     //     examine a woman under 30 who still has all of her pubic hair."
@@ -434,7 +433,6 @@ const TASKS = [
         <ul>
           <li><b>The funnel:</b> broad (bodies and culture) → narrow (pubic hair) → gap → question.</li>
           <li><b>D and I are one kind of evidence (surveys).</b> B says so: it weighs the evidence. K is the gap that weighing produces. Weigh first, then the gap.</li>
-          <li><b>Round 2:</b> with E at the end (the authors' structure), "This matters because..." moves with E, and "In addition," now links D straight to I. The links into B, K and G don't move: they belong to the gap and the question, whatever the order.</li>
         </ul>`,
     },
     printIntro: `
@@ -444,8 +442,7 @@ const TASKS = [
         <li>Put one connective card in every gap between two claims. Each connective can be used once. There are spares, so some will be left over.</li>
         <li>If no connective fits a gap, the order is wrong or a claim is missing. Move things around. Write on a blank card only if nothing printed fits.</li>
         <li>Check your order against the paper (the Introduction, PDF pp. 1-4).</li>
-      </ol>
-      <p><b>Round 2:</b> try the authors' own structure. In the paper, <i>why this matters</i> (card E: health risks, costs, a new body norm) comes after the research question, as a separate rationale. Move E to the end. Which connectives had to move, and which stayed put?</p>`,
+      </ol>`,
     question: "G",
     claimsHeading: "Claim cards (Braun, Tricklebank & Clarke, 2013, simplified)",
     blankConns: 2,
@@ -545,7 +542,7 @@ const TASKS = [
         </ul>`,
     },
     printIntro: `
-      <p><b>The study:</b> <i>How do students describe what time in green space does for them during exam periods?</i></p>
+      <p><b>The study:</b> This study is made up, but it is based on real papers. Imagine you are writing the Introduction for an interview study with students, analysed using reflexive thematic analysis.</p>
       <p>The yellow cards are claims an Introduction to this study might make. The sources on them are real. The blue cards are connectives: the words that link one claim to the next.</p>
       <ol>
         <li>Cut out the cards.</li>
@@ -706,7 +703,7 @@ const cardHTML = (item, st, where, ci) => {
   const mark = st.marks[item.id] ? ` mark-${st.marks[item.id]}` : "";
   const tools = where === "chain"
     ? `<span class="tools"><button data-act="up" title="Move up" aria-label="Move up">↑</button><button data-act="down" title="Move down" aria-label="Move down">↓</button><button data-act="out" title="Back to deck" aria-label="Back to deck">✕</button></span>`
-    : `<span class="tools"><button data-act="add" title="Add to the end of the argument" aria-label="Add to argument">→</button>${item.custom ? '<button data-act="del" title="Delete card" aria-label="Delete card">✕</button>' : ""}</span>`;
+    : `<span class="tools"><button data-act="add" title="Add to the argument" aria-label="Add to argument">→</button>${item.custom ? '<button data-act="del" title="Delete card" aria-label="Delete card">✕</button>' : ""}</span>`;
   const ciAttr = ci !== undefined ? ` data-ci="${ci}"` : "";
   if (item.kind === "conn") {
     const body = item.custom
@@ -959,8 +956,14 @@ document.addEventListener("click", e => {
   const ci = id ? st.chain.indexOf(id) : -1;
   const acts = {
     // with an anchor card in place, new cards go before it (questions go after it)
-    add: () => move(id, "chain", t.anchor && st.chain.includes(t.anchor) && !t.afterAnchor.includes(id)
-      ? st.chain.indexOf(t.anchor) : st.chain.length),
+    // otherwise the first empty slot that takes this kind of card, so it doesn't land below the clues
+    add: () => {
+      const accept = card.classList.contains("conn") ? "conn" : "claim";
+      const slot = app.querySelector(`#chain .slot[data-accept="${accept}"]:not(.anchor-zone)`);
+      move(id, "chain", slot ? +slot.dataset.slot
+        : t.anchor && st.chain.includes(t.anchor) && !t.afterAnchor.includes(id) ? st.chain.indexOf(t.anchor)
+        : st.chain.length);
+    },
     out: () => move(id, "pool"),
     up: () => ci > 0 && move(id, "chain", ci - 1),
     down: () => ci < st.chain.length - 1 && move(id, "chain", ci + 2),
@@ -1076,7 +1079,7 @@ const runCheck = (t, st) => {
 
   const bad = fb.filter(f => f.level === "bad").length, warn = fb.filter(f => f.level === "warn").length;
   if (!bad && !warn && !unplaced.length) fb.unshift({ level: "win", msg: t.mode === "connect"
-    ? "This works: every claim follows from the one before, and the links say how. Now try a different order (round 2), or copy it as text and turn it into a paragraph."
+    ? "This works: every claim follows from the one before, and the links say how. Now copy it as text and turn it into a paragraph."
     : "This works: claim, extract-interpretation pairs, an edge and a summary. Now press Hide the extracts and read it aloud." });
   else if (!bad && !unplaced.length) fb.unshift({ level: "info", msg: "Nearly there: no outright problems, but have a look at the amber points." });
   st.feedback = fb; st.marks = marks;
@@ -1116,7 +1119,7 @@ const checkBraun = (t, st, items, { add, mark, pos, has, L, claims }) => {
   const n = claims.length;
   if (has("G")) {
     if (claims[n - 1] === "G") { mark("G", "good"); add("good", "The research question (G) ends the argument: everything before it builds towards it."); }
-    else if (claims[n - 1] === "E" && pos("G") === n - 2) { mark("G", "good"); add("good", "G then E: the authors' own structure, with 'why it matters' after the question (round 2). Which connectives moved, and which stayed put?"); }
+    else if (claims[n - 1] === "E" && pos("G") === n - 2) { mark("G", "good"); add("good", "G then E: this is how the authors did it, with 'why it matters' after the research question."); }
     else { mark("G", "bad"); add("bad", "The research question (G) should come at the end. Everything else is a step towards it."); }
   }
   if (has("B") && has("D") && pos("B") < pos("D")) { mark("B", "bad"); add("bad", `${L("B")} weighs the survey evidence (what fixed-choice surveys can tell us), so the evidence it weighs (${L("D")}) has to come before it.`); }
